@@ -27,7 +27,7 @@ jobs:
       shell: pwsh
       run: |
         $certBytes = [System.Convert]::FromBase64String("${{ secrets.SIGN_CERT }}")
-        Set-Content -Value $certBytes -Encoding Byte -Path signing_cert.pfx
+        [System.IO.File]::WriteAllBytes("signing_cert.pfx", $certBytes)
 
     - name: Sign MSIX Bundle
       shell: pwsh
