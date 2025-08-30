@@ -23,20 +23,27 @@ jobs:
     - name: Build
       run: MSBuild -binaryLogger:Output\BuildAllTargets.binlog -m BuildAllTargets.proj
       
-    - name: Decode signing certificate
+    - name: Decode signing certificate (PFX)
       shell: pwsh
       run: |
         $certBytes = [System.Convert]::FromBase64String("${{ secrets.SIGN_CERT }}")
-        [System.IO.File]::WriteAllBytes("signing_cert.pfx", $certBytes)
+        Set-Content -Path signing_cert.pfx -Value $certBytes -AsByteStream
 
-    - name: Sign MSIX Bundle
+    - name: Extract CER from PFX
+      shell: pwsh
+      run: |
+        $password = ConvertTo-SecureString "${{ secrets.SIGN_CERT_PASSWORD }}" -AsPlainText -Force
+        $pfx = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("signing_cert.pfx", $password)
+        Export-Certificate -Cert $pfx -FilePath signing_cert.cer
+
+    - name: Sign MSIX
       shell: pwsh
       run: |
         $bundle = Get-ChildItem -Path "Output/Binaries/AppPackages" -Filter "*.msixbundle" -Recurse | Select-Object -First 1
         if (-not $bundle) { throw "MSIX bundle not found!" }
 
         $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter signtool.exe |
-          Where-Object { $_.FullName -match '\\x64\\' } |
+          Where-Object { $_.FullName -match '\\x64\\' -and $_.FullName -notmatch '\\arm' -and $_.FullName -notmatch '\\arm64' } |
           Sort-Object FullName -Descending |
           Select-Object -First 1
 
@@ -48,6 +55,12 @@ jobs:
           /p "${{ secrets.SIGN_CERT_PASSWORD }}" `
           /v $bundle.FullName
 
+    - name: Upload CER certificate
+      uses: actions/upload-artifact@v4
+      with:
+        name: signing-cert
+        path: signing_cert.cer
+        
     - name: Upload MSIX Bundle
       uses: actions/upload-artifact@v4
       with:
