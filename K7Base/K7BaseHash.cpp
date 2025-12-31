@@ -1,14 +1,14 @@
 ﻿/*
- * PROJECT:    NanaZip Platform Abstraction Layer (K7Pal)
- * FILE:       K7PalHash.cpp
- * PURPOSE:    Implementation for K7Pal Hash Algorithms Interfaces
+ * PROJECT:    NanaZip Platform Base Library (K7Base)
+ * FILE:       K7BaseHash.cpp
+ * PURPOSE:    Implementation for NanaZip Platform Hash Algorithms Interfaces
  *
  * LICENSE:    The MIT License
  *
  * MAINTAINER: MouriNaruto (Kenji.Mouri@outlook.com)
  */
 
-#include "K7Pal.h"
+#include "K7BaseHash.h"
 
 #include <Mile.Helpers.Base.h>
 
@@ -20,14 +20,14 @@
 
 namespace
 {
-    typedef struct _K7_PAL_HASH_ALGORITHM
+    typedef struct _K7_BASE_HASH_ALGORITHM
     {
         MO_CONSTANT_WIDE_STRING Identifier;
         BCRYPT_ALG_HANDLE Handle;
         BCRYPT_ALG_HANDLE HmacHandle;
-    } K7_PAL_HASH_ALGORITHM, *PK7_PAL_HASH_ALGORITHM;
+    } K7_BASE_HASH_ALGORITHM, *PK7_BASE_HASH_ALGORITHM;
 
-    K7_PAL_HASH_ALGORITHM g_HashAlgorithms[] =
+    K7_BASE_HASH_ALGORITHM g_HashAlgorithms[K7_BASE_HASH_ALGORITHM_MAXIMUM] =
     {
         { BCRYPT_MD2_ALGORITHM, nullptr, nullptr },
         { BCRYPT_MD4_ALGORITHM, nullptr, nullptr },
@@ -38,28 +38,25 @@ namespace
         { BCRYPT_SHA512_ALGORITHM, nullptr, nullptr },
     };
 
-    const std::size_t g_HashAlgorithmsCount =
-        sizeof(g_HashAlgorithms) / sizeof(*g_HashAlgorithms);
-
-    typedef struct _K7_PAL_HASH_CONTEXT
+    typedef struct _K7_BASE_HASH_CONTEXT
     {
         MO_UINT32 ContextSize;
         MO_UINT32 HashSize;
         MO_UINT32 HashObjectSize;
         MO_POINTER HashObject;
         BCRYPT_HASH_HANDLE HashHandle;
-    } K7_PAL_HASH_CONTEXT, *PK7_PAL_HASH_CONTEXT;
+    } K7_BASE_HASH_CONTEXT, *PK7_BASE_HASH_CONTEXT;
 
-    static PK7_PAL_HASH_CONTEXT K7PalHashInternalGetContextFromHandle(
-        _In_opt_ K7_PAL_HASH_HANDLE HashHandle)
+    static PK7_BASE_HASH_CONTEXT K7BaseHashInternalGetContextFromHandle(
+        _In_opt_ K7_BASE_HASH_HANDLE HashHandle)
     {
         if (HashHandle)
         {
             __try
             {
-                PK7_PAL_HASH_CONTEXT Context =
-                    reinterpret_cast<PK7_PAL_HASH_CONTEXT>(HashHandle);
-                if (sizeof(K7_PAL_HASH_CONTEXT) == Context->ContextSize)
+                PK7_BASE_HASH_CONTEXT Context =
+                    reinterpret_cast<PK7_BASE_HASH_CONTEXT>(HashHandle);
+                if (sizeof(K7_BASE_HASH_CONTEXT) == Context->ContextSize)
                 {
                     return Context;
                 }
@@ -74,27 +71,14 @@ namespace
     }
 }
 
-EXTERN_C MO_RESULT MOAPI K7PalHashCreate(
-    _Inout_ PK7_PAL_HASH_HANDLE HashHandle,
-    _In_ MO_CONSTANT_WIDE_STRING AlgorithmIdentifier,
+EXTERN_C MO_RESULT MOAPI K7BaseHashCreate(
+    _Inout_ PK7_BASE_HASH_HANDLE HashHandle,
+    _In_ K7_BASE_HASH_ALGORITHM_TYPE Algorithm,
     _In_opt_ MO_POINTER SecretBuffer,
     _In_ MO_UINT32 SecretSize)
 {
-    PK7_PAL_HASH_ALGORITHM CurrentAlgorithm = nullptr;
-    if (AlgorithmIdentifier)
-    {
-        for (std::size_t i = 0; i < g_HashAlgorithmsCount; ++i)
-        {
-            if (0 == std::wcscmp(
-                AlgorithmIdentifier,
-                g_HashAlgorithms[i].Identifier))
-            {
-                CurrentAlgorithm = &g_HashAlgorithms[i];
-                break;
-            }
-        }
-    }
-    if (!CurrentAlgorithm)
+    if (Algorithm < 0 ||
+        Algorithm >= K7_BASE_HASH_ALGORITHM_MAXIMUM)
     {
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
@@ -109,45 +93,45 @@ EXTERN_C MO_RESULT MOAPI K7PalHashCreate(
 
     do
     {
-        PK7_PAL_HASH_CONTEXT Context = reinterpret_cast<PK7_PAL_HASH_CONTEXT>(
-            ::MileAllocateMemory(sizeof(K7_PAL_HASH_CONTEXT)));
+        PK7_BASE_HASH_CONTEXT Context = reinterpret_cast<PK7_BASE_HASH_CONTEXT>(
+            ::MileAllocateMemory(sizeof(K7_BASE_HASH_CONTEXT)));
         if (!Context)
         {
             break;
         }
-        *HashHandle = reinterpret_cast<K7_PAL_HASH_HANDLE>(Context);
-        Context->ContextSize = sizeof(K7_PAL_HASH_CONTEXT);
+        *HashHandle = reinterpret_cast<K7_BASE_HASH_HANDLE>(Context);
+        Context->ContextSize = sizeof(K7_BASE_HASH_CONTEXT);
 
         BCRYPT_ALG_HANDLE AlgorithmHandle = nullptr;
         if (SecretBuffer)
         {
-            if (!CurrentAlgorithm->HmacHandle)
+            if (!g_HashAlgorithms[Algorithm].HmacHandle)
             {
                 if (!BCRYPT_SUCCESS(::BCryptOpenAlgorithmProvider(
-                    &CurrentAlgorithm->HmacHandle,
-                    CurrentAlgorithm->Identifier,
+                    &g_HashAlgorithms[Algorithm].HmacHandle,
+                    g_HashAlgorithms[Algorithm].Identifier,
                     nullptr,
                     BCRYPT_ALG_HANDLE_HMAC_FLAG)))
                 {
                     break;
                 }
             }
-            AlgorithmHandle = CurrentAlgorithm->HmacHandle;
+            AlgorithmHandle = g_HashAlgorithms[Algorithm].HmacHandle;
         }
         else
         {
-            if (!CurrentAlgorithm->Handle)
+            if (!g_HashAlgorithms[Algorithm].Handle)
             {
                 if (!BCRYPT_SUCCESS(::BCryptOpenAlgorithmProvider(
-                    &CurrentAlgorithm->Handle,
-                    CurrentAlgorithm->Identifier,
+                    &g_HashAlgorithms[Algorithm].Handle,
+                    g_HashAlgorithms[Algorithm].Identifier,
                     nullptr,
                     0)))
                 {
                     break;
                 }
             }
-            AlgorithmHandle = CurrentAlgorithm->Handle;
+            AlgorithmHandle = g_HashAlgorithms[Algorithm].Handle;
         }
 
         {
@@ -197,18 +181,18 @@ EXTERN_C MO_RESULT MOAPI K7PalHashCreate(
 
     if (!Result)
     {
-        ::K7PalHashDestroy(*HashHandle);
+        ::K7BaseHashDestroy(*HashHandle);
         *HashHandle = nullptr;
     }
 
     return Result ? MO_RESULT_SUCCESS_OK : MO_RESULT_ERROR_FAIL;
 }
 
-EXTERN_C MO_RESULT MOAPI K7PalHashDestroy(
-    _Inout_opt_ K7_PAL_HASH_HANDLE HashHandle)
+EXTERN_C MO_RESULT MOAPI K7BaseHashDestroy(
+    _Inout_opt_ K7_BASE_HASH_HANDLE HashHandle)
 {
-    PK7_PAL_HASH_CONTEXT Context =
-        ::K7PalHashInternalGetContextFromHandle(HashHandle);
+    PK7_BASE_HASH_CONTEXT Context =
+        ::K7BaseHashInternalGetContextFromHandle(HashHandle);
     if (!Context)
     {
         return MO_RESULT_ERROR_INVALID_PARAMETER;
@@ -237,13 +221,13 @@ EXTERN_C MO_RESULT MOAPI K7PalHashDestroy(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI K7PalHashUpdate(
-    _Inout_ K7_PAL_HASH_HANDLE HashHandle,
+EXTERN_C MO_RESULT MOAPI K7BaseHashUpdate(
+    _Inout_ K7_BASE_HASH_HANDLE HashHandle,
     _In_ MO_POINTER InputBuffer,
     _In_ MO_UINT32 InputSize)
 {
-    PK7_PAL_HASH_CONTEXT Context =
-        ::K7PalHashInternalGetContextFromHandle(HashHandle);
+    PK7_BASE_HASH_CONTEXT Context =
+        ::K7BaseHashInternalGetContextFromHandle(HashHandle);
     if (!Context)
     {
         return MO_RESULT_ERROR_INVALID_PARAMETER;
@@ -258,13 +242,13 @@ EXTERN_C MO_RESULT MOAPI K7PalHashUpdate(
     return Result ? MO_RESULT_SUCCESS_OK : MO_RESULT_ERROR_FAIL;
 }
 
-EXTERN_C MO_RESULT MOAPI K7PalHashFinal(
-    _Inout_ K7_PAL_HASH_HANDLE HashHandle,
+EXTERN_C MO_RESULT MOAPI K7BaseHashFinal(
+    _Inout_ K7_BASE_HASH_HANDLE HashHandle,
     _Out_ MO_POINTER OutputBuffer,
     _In_ MO_UINT32 OutputSize)
 {
-    PK7_PAL_HASH_CONTEXT Context =
-        ::K7PalHashInternalGetContextFromHandle(HashHandle);
+    PK7_BASE_HASH_CONTEXT Context =
+        ::K7BaseHashInternalGetContextFromHandle(HashHandle);
     if (!Context)
     {
         return MO_RESULT_ERROR_INVALID_PARAMETER;
@@ -307,8 +291,8 @@ EXTERN_C MO_RESULT MOAPI K7PalHashFinal(
     return Result ? MO_RESULT_SUCCESS_OK : MO_RESULT_ERROR_FAIL;
 }
 
-EXTERN_C MO_RESULT MOAPI K7PalHashGetSize(
-    _In_ K7_PAL_HASH_HANDLE HashHandle,
+EXTERN_C MO_RESULT MOAPI K7BaseHashGetSize(
+    _In_ K7_BASE_HASH_HANDLE HashHandle,
     _Out_ PMO_UINT32 HashSize)
 {
     if (!HashSize)
@@ -316,8 +300,8 @@ EXTERN_C MO_RESULT MOAPI K7PalHashGetSize(
         return MO_RESULT_ERROR_INVALID_PARAMETER;
     }
 
-    PK7_PAL_HASH_CONTEXT Context =
-        ::K7PalHashInternalGetContextFromHandle(HashHandle);
+    PK7_BASE_HASH_CONTEXT Context =
+        ::K7BaseHashInternalGetContextFromHandle(HashHandle);
     if (!Context)
     {
         return MO_RESULT_ERROR_INVALID_PARAMETER;
@@ -327,9 +311,9 @@ EXTERN_C MO_RESULT MOAPI K7PalHashGetSize(
     return MO_RESULT_SUCCESS_OK;
 }
 
-EXTERN_C MO_RESULT MOAPI K7PalHashDuplicate(
-    _In_ K7_PAL_HASH_HANDLE SourceHashHandle,
-    _Out_ PK7_PAL_HASH_HANDLE DestinationHashHandle)
+EXTERN_C MO_RESULT MOAPI K7BaseHashDuplicate(
+    _In_ K7_BASE_HASH_HANDLE SourceHashHandle,
+    _Out_ PK7_BASE_HASH_HANDLE DestinationHashHandle)
 {
     if (!DestinationHashHandle)
     {
@@ -337,8 +321,8 @@ EXTERN_C MO_RESULT MOAPI K7PalHashDuplicate(
     }
     *DestinationHashHandle = nullptr;
 
-    PK7_PAL_HASH_CONTEXT SourceContext =
-        ::K7PalHashInternalGetContextFromHandle(SourceHashHandle);
+    PK7_BASE_HASH_CONTEXT SourceContext =
+        ::K7BaseHashInternalGetContextFromHandle(SourceHashHandle);
     if (!SourceContext)
     {
         return MO_RESULT_ERROR_INVALID_PARAMETER;
@@ -348,14 +332,14 @@ EXTERN_C MO_RESULT MOAPI K7PalHashDuplicate(
 
     do
     {
-        PK7_PAL_HASH_CONTEXT Context = reinterpret_cast<PK7_PAL_HASH_CONTEXT>(
-            ::MileAllocateMemory(sizeof(K7_PAL_HASH_CONTEXT)));
+        PK7_BASE_HASH_CONTEXT Context = reinterpret_cast<PK7_BASE_HASH_CONTEXT>(
+            ::MileAllocateMemory(sizeof(K7_BASE_HASH_CONTEXT)));
         if (!Context)
         {
             break;
         }
-        *DestinationHashHandle = reinterpret_cast<K7_PAL_HASH_HANDLE>(Context);
-        Context->ContextSize = sizeof(K7_PAL_HASH_CONTEXT);
+        *DestinationHashHandle = reinterpret_cast<K7_BASE_HASH_HANDLE>(Context);
+        Context->ContextSize = sizeof(K7_BASE_HASH_CONTEXT);
 
         Context->HashSize = SourceContext->HashSize;
 
@@ -378,7 +362,7 @@ EXTERN_C MO_RESULT MOAPI K7PalHashDuplicate(
 
     if (!Result)
     {
-        ::K7PalHashDestroy(*DestinationHashHandle);
+        ::K7BaseHashDestroy(*DestinationHashHandle);
         *DestinationHashHandle = nullptr;
     }
 

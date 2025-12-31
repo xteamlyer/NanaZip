@@ -847,7 +847,7 @@ HRESULT CCodecs::Load()
     const FString baseFolder = GetBaseFolderPrefixFromRegistry();
     // **************** NanaZip Modification Start ****************
     {
-      ::MileLoadLibraryFromSystem32(baseFolder + L"K7Pal.dll");
+      ::MileLoadLibraryFromSystem32(baseFolder + L"K7Base.dll");
       bool loadedOK;
       RINOK(LoadDll(baseFolder + L"NanaZip.Codecs.dll", false, &loadedOK));
       if (!loadedOK)
