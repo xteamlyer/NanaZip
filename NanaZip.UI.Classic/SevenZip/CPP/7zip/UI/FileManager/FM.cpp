@@ -731,10 +731,7 @@ void NanaZipInitialize()
         ::ExitProcess(1);
     }
 
-    if (MO_RESULT_SUCCESS_OK != ::K7UserInitializeDarkModeSupport())
-    {
-        ::ErrorMessage(L"K7UserInitializeDarkModeSupport Failed");
-    }
+    ::K7UserInitializeDarkModeSupport();
 
     if (MO_RESULT_SUCCESS_OK != ::K7BaseDisableDynamicCodeGeneration())
     {

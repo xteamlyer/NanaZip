@@ -36,8 +36,8 @@ EXTERN_C HTHEME WINAPI OpenNcThemeData(
 
 namespace
 {
-    const COLORREF g_LightModeBackgroundColor = RGB(255, 255, 255);
-    const COLORREF g_LightModeForegroundColor = RGB(0, 0, 0);
+    const COLORREF g_LightModeBackgroundColor = RGB(0, 0, 0);
+    const COLORREF g_LightModeForegroundColor = RGB(255, 255, 255);
 
     const COLORREF g_DarkModeBackgroundColor = RGB(0, 0, 0);
     const COLORREF g_DarkModeForegroundColor = RGB(255, 255, 255);
@@ -162,9 +162,7 @@ namespace
                 return;
             }
 
-            this->ShouldAppsUseDarkMode =
-                ::MileShouldAppsUseDarkMode() &&
-                !::MileShouldAppsUseHighContrastMode();
+            this->ShouldAppsUseDarkMode = true;
         }
 
         ~ThreadContext()
@@ -172,7 +170,7 @@ namespace
             ::UnhookWindowsHookEx(this->WindowsHookHandle);
             this->WindowsHookHandle = nullptr;
 
-            this->ShouldAppsUseDarkMode = false;
+            this->ShouldAppsUseDarkMode = true;
         }
     };
     thread_local ThreadContext g_ThreadContext;
@@ -359,9 +357,7 @@ namespace
             {
                 ::MileRefreshImmersiveColorPolicyState();
 
-                g_ThreadContext.ShouldAppsUseDarkMode =
-                    ::MileShouldAppsUseDarkMode() &&
-                    !::MileShouldAppsUseHighContrastMode();
+                g_ThreadContext.ShouldAppsUseDarkMode = true;
 
                 ::MileEnableImmersiveDarkModeForWindow(
                     hWnd,
