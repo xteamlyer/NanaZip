@@ -5,12 +5,16 @@
 #include <Mile.Helpers.CppWinRT.h>
 #include "ControlMacros.h"
 
-#include <Windows.h>
+#include "NanaZip.Modern.h"
+
+#include <winrt/Windows.System.h>
 
 namespace winrt
 {
-    using namespace Windows::Foundation;
-    using namespace Windows::UI::Xaml;
+    using Windows::Foundation::IInspectable;
+    using Windows::System::DispatcherQueue;
+    using Windows::UI::Xaml::RoutedEventArgs;
+    using Windows::UI::Xaml::RoutedEventHandler;
 }
 
 namespace winrt::NanaZip::Modern::implementation
@@ -49,10 +53,6 @@ namespace winrt::NanaZip::Modern::implementation
             winrt::hstring
         );
         DEPENDENCY_PROPERTY_HEADER(
-            TotalSizeText,
-            winrt::hstring
-        );
-        DEPENDENCY_PROPERTY_HEADER(
             ProcessedText,
             winrt::hstring
         );
@@ -73,32 +73,7 @@ namespace winrt::NanaZip::Modern::implementation
             PauseButtonText,
             winrt::hstring
         );
-        DEPENDENCY_PROPERTY_HEADER(
-            CancelButtonText,
-            winrt::hstring
-        );
 
-        DEPENDENCY_PROPERTY_HEADER(
-            ProgressBarMinimum,
-            double
-        );
-        DEPENDENCY_PROPERTY_HEADER(
-            ProgressBarMaximum,
-            double
-        );
-        DEPENDENCY_PROPERTY_HEADER(
-            ProgressBarValue,
-            double
-        );
-
-        DEPENDENCY_PROPERTY_HEADER(
-            ShowBackgroundButton,
-            bool
-        );
-        DEPENDENCY_PROPERTY_HEADER(
-            ShowPauseButton,
-            bool
-        );
         DEPENDENCY_PROPERTY_HEADER(
             ShowPackedValue,
             bool
@@ -111,19 +86,6 @@ namespace winrt::NanaZip::Modern::implementation
         DEPENDENCY_PROPERTY_HEADER(
             ShowPaused,
             bool
-        );
-        DEPENDENCY_PROPERTY_HEADER(
-            ShowResults,
-            bool
-        );
-        DEPENDENCY_PROPERTY_HEADER(
-            ShowProgress,
-            bool
-        );
-
-        DEPENDENCY_PROPERTY_HEADER(
-            ResultsText,
-            winrt::hstring
         );
 
         void BackgroundButtonClickedHandler(
@@ -142,9 +104,25 @@ namespace winrt::NanaZip::Modern::implementation
             winrt::IInspectable const& sender,
             winrt::RoutedEventArgs const& e);
 
+        void UpdateStatus(
+            _In_ PK7_PROGRESS_DIALOG_STATUS Status);
+
     private:
 
         HWND m_WindowHandle;
+        DispatcherQueue m_DispatcherQueue = nullptr;
+
+        // Title
+        // FilePath
+        std::uint64_t m_TotalSize = static_cast<std::uint64_t>(-1);
+        //std::uint64_t m_ProcessedSize = static_cast<std::uint64_t>(-1);
+        //std::uint64_t m_TotalFiles = static_cast<std::uint64_t>(-1);
+        //std::uint64_t m_ProcessedFiles = static_cast<std::uint64_t>(-1);
+        //std::uint64_t m_InputSize = static_cast<std::uint64_t>(-1);
+        //std::uint64_t m_OutputSize = static_cast<std::uint64_t>(-1);
+
+        std::uint64_t m_TotalProgress = static_cast<std::uint64_t>(-1);
+        std::uint64_t m_ProcessedProgress = static_cast<std::uint64_t>(-1);
     };
 }
 
