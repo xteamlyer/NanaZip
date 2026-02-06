@@ -15,25 +15,6 @@
 
 #include "MyWindowsNew.h"
 
-// **************** NanaZip Modification Start ****************
-#pragma push_macro("GetCurrentTime")
-#undef GetCurrentTime
-
-#include <Mile.Xaml.h>
-#include <winrt/Windows.Foundation.h>
-#include <winrt/Windows.UI.Xaml.h>
-#include <winrt/NanaZip.Modern.h>
-
-#pragma pop_macro("GetCurrentTime")
-
-namespace winrt
-{
-    using NanaZip::Modern::ProgressPage;
-    using Windows::Foundation::IInspectable;
-    using Windows::UI::Xaml::RoutedEventArgs;
-}
-// **************** NanaZip Modification End ****************
-
 struct CProgressMessageBoxPair
 {
   UString Title;
@@ -173,11 +154,6 @@ class CProgressDialog: public NWindows::NControl::CModalDialog
 
   NWindows::NControl::CProgressBar m_ProgressBar;
   NWindows::NControl::CListView _messageList;
-  // **************** NanaZip Modification Start ****************
-  bool m_FirstRun = true;
-  winrt::ProgressPage m_ProgressPage{ nullptr };
-  std::wstring m_ResultString;
-  // **************** NanaZip Modification End ****************
   
   int _numMessages;
   UStringVector _messageStrings;
@@ -233,13 +209,13 @@ class CProgressDialog: public NWindows::NControl::CModalDialog
   #endif
   void SetTaskbarProgressState();
 
+  // **************** NanaZip Modification Start ****************
+#if 0 // ******** Annotated 7-Zip Mainline Source Code snippet Start ********
   void UpdateStatInfo(bool showAll);
   bool OnTimer(WPARAM timerID, LPARAM callback);
   void SetProgressRange(UInt64 range);
   void SetProgressPos(UInt64 pos);
   virtual bool OnInit();
-  // **************** NanaZip Modification Start ****************
-#if 0 // ******** Annotated 7-Zip Mainline Source Code snippet Start ********
   virtual bool OnSize(WPARAM wParam, int xSize, int ySize);
   virtual void OnCancel();
   virtual void OnOK();
@@ -254,28 +230,27 @@ class CProgressDialog: public NWindows::NControl::CModalDialog
   void AddToTitle(LPCWSTR string);
   #endif
 
+  // **************** NanaZip Modification Start ****************
+#if 0 // ******** Annotated 7-Zip Mainline Source Code snippet Start ********
   void SetPauseText();
   void SetPriorityText();
   void OnPauseButton();
   void OnPriorityButton();
-  // **************** NanaZip Modification Start ****************
-  //bool OnButtonClicked(int buttonID, HWND buttonHWND);
-  //bool OnMessage(UINT message, WPARAM wParam, LPARAM lParam);
-  bool OnCancelClickedModern();
-  bool OnMessageModern(UINT message, WPARAM wParam, LPARAM lParam);
+  bool OnButtonClicked(int buttonID, HWND buttonHWND);
+  bool OnMessage(UINT message, WPARAM wParam, LPARAM lParam);
+#endif // ******** Annotated 7-Zip Mainline Source Code snippet End ********
   // **************** NanaZip Modification End ****************
 
   void SetTitleText();
-  void ShowSize(int id, UInt64 val, UInt64& prev);
-  winrt::hstring ShowSize(UInt64 val, UInt64 &prev);
+  void ShowSize(int id, UInt64 val, UInt64 &prev);
 
   void UpdateMessagesDialog();
 
   void AddMessageDirect(LPCWSTR message, bool needNumber);
   void AddMessage(LPCWSTR message);
 
-  bool OnExternalCloseMessage();
   // **************** NanaZip Modification Start ****************
+  //bool OnExternalCloseMessage();
   //void EnableErrorsControls(bool enable);
   // **************** NanaZip Modification End ****************
 
@@ -303,6 +278,22 @@ public:
     _createDialogEvent.Set();
     _dialogCreatedEvent.Lock();
   }
+
+  // **************** NanaZip Modification Start ****************
+  bool m_FirstRun = true;
+  void ModernPause();
+  void ModernUpdateStatus();
+  bool ModernExternalCloseMessage();
+  bool ModernCancel();
+  bool ModernMessageRouter(UINT message, WPARAM wParam, LPARAM lParam);
+  static LRESULT CALLBACK ModernWindowHandler(
+      _In_ HWND hWnd,
+      _In_ UINT uMsg,
+      _In_ WPARAM wParam,
+      _In_ LPARAM lParam,
+      _In_ UINT_PTR uIdSubclass,
+      _In_ DWORD_PTR dwRefData);
+  // **************** NanaZip Modification End ****************
 
   INT_PTR Create(const UString &title, NWindows::CThread &thread, HWND wndParent = 0);
 
