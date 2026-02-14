@@ -402,7 +402,7 @@ namespace
                 {
                     UINT DpiValue = ::GetDpiForWindow(hWnd);
                     Margins.cyTopHeight =
-                        ::MulDiv(80, DpiValue, USER_DEFAULT_SCREEN_DPI);
+                        ::MulDiv(84, DpiValue, USER_DEFAULT_SCREEN_DPI);
                     Margins.cyBottomHeight =
                         ::MulDiv(32, DpiValue, USER_DEFAULT_SCREEN_DPI);
                 }
@@ -456,7 +456,7 @@ namespace
 
                 MARGINS Margins = {};
                 Margins.cyTopHeight =
-                    ::MulDiv(80, DpiValue, USER_DEFAULT_SCREEN_DPI);
+                    ::MulDiv(84, DpiValue, USER_DEFAULT_SCREEN_DPI);
                 Margins.cyBottomHeight =
                     ::MulDiv(32, DpiValue, USER_DEFAULT_SCREEN_DPI);
                 ::DwmExtendFrameIntoClientArea(hWnd, &Margins);
@@ -516,6 +516,23 @@ namespace
                 }
             }
 
+            if (::IsFileManagerWindow(hWnd))
+            {
+                RECT ClientArea = {};
+                if (::GetClientRect(hWnd, &ClientArea))
+                {
+                    ::FillRect(
+                        reinterpret_cast<HDC>(wParam),
+                        &ClientArea,
+                        reinterpret_cast<HBRUSH>(
+                            ::GetStockObject(
+                                g_ThreadContext.ShouldAppsUseDarkMode
+                                ? BLACK_BRUSH
+                                : WHITE_BRUSH)));
+                    return TRUE;
+                }
+            }
+
             break;
         }
         case WM_DPICHANGED:
@@ -530,7 +547,7 @@ namespace
 
                 MARGINS Margins = {};
                 Margins.cyTopHeight =
-                    ::MulDiv(80, DpiValue, USER_DEFAULT_SCREEN_DPI);
+                    ::MulDiv(84, DpiValue, USER_DEFAULT_SCREEN_DPI);
                 Margins.cyBottomHeight =
                     ::MulDiv(32, DpiValue, USER_DEFAULT_SCREEN_DPI);
                 ::DwmExtendFrameIntoClientArea(hWnd, &Margins);

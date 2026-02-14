@@ -30,6 +30,10 @@
 #include "PropertyNameRes.h"
 
 #include <NanaZip.Modern.h>
+#include <winrt/Windows.UI.Xaml.Hosting.h>
+#include <vector>
+// Note: All HWND should belong to the same main window thread.
+std::vector<HWND> g_K7ControlList;
 
 using namespace NWindows;
 using namespace NFile;
@@ -185,38 +189,57 @@ HRESULT CApp::Create(HWND hwnd, const UString &mainPath, const UString &arcForma
       nullptr,
       ::K7ModernCreateMainWindowToolBarPage(hwnd, g_MoreMenu));
 
-  ::SetWindowSubclass(
-      this->m_ToolBar,
-      [](
-          _In_ HWND hWnd,
-          _In_ UINT uMsg,
-          _In_ WPARAM wParam,
-          _In_ LPARAM lParam,
-          _In_ UINT_PTR uIdSubclass,
-          _In_ DWORD_PTR dwRefData) -> LRESULT
+  g_K7ControlList.insert(g_K7ControlList.begin(), this->m_ToolBar);
+
   {
-      UNREFERENCED_PARAMETER(uIdSubclass);
-      UNREFERENCED_PARAMETER(dwRefData);
+      using winrt::Windows::UI::Xaml::Hosting::DesktopWindowXamlSource;
+      using winrt::Windows::UI::Xaml::Hosting::DesktopWindowXamlSourceTakeFocusRequestedEventArgs;
+      using winrt::Windows::UI::Xaml::Hosting::XamlSourceFocusNavigationReason;
+      using winrt::Windows::UI::Xaml::Input::KeyboardNavigationMode;
 
-      switch (uMsg)
-      {
-      case WM_ERASEBKGND:
-      {
-          ::RemovePropW(hWnd, L"BackgroundFallbackColor");
-          break;
-      }
-      default:
-          break;
-      }
+      DesktopWindowXamlSource XamlSource = nullptr;
+      winrt::copy_from_abi(
+          XamlSource,
+          ::GetPropW(this->m_ToolBar, L"XamlWindowSource"));
 
-      return ::DefSubclassProc(
-          hWnd,
-          uMsg,
-          wParam,
-          lParam);
-  },
-      0,
-      0);
+      XamlSource.Content().TabFocusNavigation(KeyboardNavigationMode::Local);
+
+      XamlSource.TakeFocusRequested(
+          [this](
+              DesktopWindowXamlSource const& sender,
+              DesktopWindowXamlSourceTakeFocusRequestedEventArgs const& e)
+      {
+          UNREFERENCED_PARAMETER(sender);
+          XamlSourceFocusNavigationReason Reason = e.Request().Reason();
+          switch (Reason)
+          {
+          case XamlSourceFocusNavigationReason::First:
+          case XamlSourceFocusNavigationReason::Last:
+          {
+              std::size_t Count = g_K7ControlList.size();
+              std::size_t Index = static_cast<std::size_t>(-1);
+              for (size_t i = 0; i < Count; ++i)
+              {
+                  if (this->m_ToolBar == g_K7ControlList[i])
+                  {
+                      Index = i;
+                      break;
+                  }
+              }
+              if (static_cast<std::size_t>(-1) != Index)
+              {
+                  std::size_t NextIndex = (XamlSourceFocusNavigationReason::Last == Reason)
+                      ? ((Index == 0) ? (Count - 1) : (Index - 1))
+                      : ((Index + 1) % Count);
+                  ::SetFocus(g_K7ControlList[NextIndex]);
+              }
+              break;
+          }
+          default:
+              break;
+          }
+      });
+  }
 
   unsigned i;
   for (i = 0; i < kNumPanelsMax; i++)

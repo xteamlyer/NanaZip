@@ -38,8 +38,12 @@
 #include "PropertyNameRes.h"
 
 #include <Mile.Xaml.h>
+#include <winrt/Windows.UI.Xaml.Hosting.h>
 #include <winrt/Windows.UI.Xaml.Media.h>
 #include <winrt/Windows.UI.Xaml.Input.h>
+#include <vector>
+// Note: All HWND should belong to the same main window thread.
+extern std::vector<HWND> g_K7ControlList;
 
 using namespace NWindows;
 using namespace NControl;
@@ -58,7 +62,7 @@ static DWORD kStyles[4] = { LVS_ICON, LVS_SMALLICON, LVS_LIST, LVS_REPORT };
 extern HINSTANCE g_hInstance;
 extern DWORD g_ComCtl32Version;
 
-static const int AddressBarHeight = 32;
+static const int AddressBarHeight = 36;
 static const int StatusBarHeight = 32;
 
 void CPanel::Release()
@@ -431,38 +435,55 @@ bool CPanel::OnCreate(CREATESTRUCT * /* createStruct */)
       winrt::get_abi(_addressBarControl)
   );
 
-  ::SetWindowSubclass(
-      _addressBarWindow,
-      [](
-          _In_ HWND hWnd,
-          _In_ UINT uMsg,
-          _In_ WPARAM wParam,
-          _In_ LPARAM lParam,
-          _In_ UINT_PTR uIdSubclass,
-          _In_ DWORD_PTR dwRefData) -> LRESULT
-      {
-          UNREFERENCED_PARAMETER(uIdSubclass);
-          UNREFERENCED_PARAMETER(dwRefData);
+  {
+      using winrt::Windows::UI::Xaml::Hosting::DesktopWindowXamlSource;
+      using winrt::Windows::UI::Xaml::Hosting::DesktopWindowXamlSourceTakeFocusRequestedEventArgs;
+      using winrt::Windows::UI::Xaml::Hosting::XamlSourceFocusNavigationReason;
+      using winrt::Windows::UI::Xaml::Input::KeyboardNavigationMode;
 
-          switch (uMsg)
+      DesktopWindowXamlSource XamlSource = nullptr;
+      winrt::copy_from_abi(
+          XamlSource,
+          ::GetPropW(_addressBarWindow, L"XamlWindowSource"));
+
+      XamlSource.Content().TabFocusNavigation(KeyboardNavigationMode::Local);
+
+      XamlSource.TakeFocusRequested(
+          [this](
+              DesktopWindowXamlSource const& sender,
+              DesktopWindowXamlSourceTakeFocusRequestedEventArgs const& e)
+      {
+          UNREFERENCED_PARAMETER(sender);
+          XamlSourceFocusNavigationReason Reason = e.Request().Reason();
+          switch (Reason)
           {
-          case WM_ERASEBKGND:
+          case XamlSourceFocusNavigationReason::First:
+          case XamlSourceFocusNavigationReason::Last:
           {
-              ::RemovePropW(hWnd, L"BackgroundFallbackColor");
+              std::size_t Count = g_K7ControlList.size();
+              std::size_t Index = static_cast<std::size_t>(-1);
+              for (size_t i = 0; i < Count; ++i)
+              {
+                  if (this->_addressBarWindow == g_K7ControlList[i])
+                  {
+                      Index = i;
+                      break;
+                  }
+              }
+              if (static_cast<std::size_t>(-1) != Index)
+              {
+                  std::size_t NextIndex = (XamlSourceFocusNavigationReason::Last == Reason)
+                      ? ((Index == 0) ? (Count - 1) : (Index - 1))
+                      : ((Index + 1) % Count);
+                  ::SetFocus(g_K7ControlList[NextIndex]);
+              }
               break;
           }
           default:
               break;
           }
-
-          return ::DefSubclassProc(
-              hWnd,
-              uMsg,
-              wParam,
-              lParam);
-      },
-      0,
-      0);
+      });
+  }
 
   _sysImageList = GetSysImageList(true);
 
@@ -520,38 +541,59 @@ bool CPanel::OnCreate(CREATESTRUCT * /* createStruct */)
       winrt::get_abi(_statusBarControl)
   );
 
-  ::SetWindowSubclass(
-      _statusBarWindow,
-      [](
-          _In_ HWND hWnd,
-          _In_ UINT uMsg,
-          _In_ WPARAM wParam,
-          _In_ LPARAM lParam,
-          _In_ UINT_PTR uIdSubclass,
-          _In_ DWORD_PTR dwRefData) -> LRESULT
-      {
-          UNREFERENCED_PARAMETER(uIdSubclass);
-          UNREFERENCED_PARAMETER(dwRefData);
+  {
+      using winrt::Windows::UI::Xaml::Hosting::DesktopWindowXamlSource;
+      using winrt::Windows::UI::Xaml::Hosting::DesktopWindowXamlSourceTakeFocusRequestedEventArgs;
+      using winrt::Windows::UI::Xaml::Hosting::XamlSourceFocusNavigationReason;
+      using winrt::Windows::UI::Xaml::Input::KeyboardNavigationMode;
 
-          switch (uMsg)
+      DesktopWindowXamlSource XamlSource = nullptr;
+      winrt::copy_from_abi(
+          XamlSource,
+          ::GetPropW(_statusBarWindow, L"XamlWindowSource"));
+
+      XamlSource.Content().TabFocusNavigation(KeyboardNavigationMode::Local);
+
+      XamlSource.TakeFocusRequested(
+          [this](
+              DesktopWindowXamlSource const& sender,
+              DesktopWindowXamlSourceTakeFocusRequestedEventArgs const& e)
+      {
+          UNREFERENCED_PARAMETER(sender);
+          XamlSourceFocusNavigationReason Reason = e.Request().Reason();
+          switch (Reason)
           {
-          case WM_ERASEBKGND:
+          case XamlSourceFocusNavigationReason::First:
+          case XamlSourceFocusNavigationReason::Last:
           {
-              ::RemovePropW(hWnd, L"BackgroundFallbackColor");
+              std::size_t Count = g_K7ControlList.size();
+              std::size_t Index = static_cast<std::size_t>(-1);
+              for (size_t i = 0; i < Count; ++i)
+              {
+                  if (this->_statusBarWindow == g_K7ControlList[i])
+                  {
+                      Index = i;
+                      break;
+                  }
+              }
+              if (static_cast<std::size_t>(-1) != Index)
+              {
+                  std::size_t NextIndex = (XamlSourceFocusNavigationReason::Last == Reason)
+                      ? ((Index == 0) ? (Count - 1) : (Index - 1))
+                      : ((Index + 1) % Count);
+                  ::SetFocus(g_K7ControlList[NextIndex]);
+              }
               break;
           }
           default:
               break;
           }
+      });
+  }
 
-          return ::DefSubclassProc(
-              hWnd,
-              uMsg,
-              wParam,
-              lParam);
-      },
-      0,
-      0);
+  g_K7ControlList.push_back(_addressBarWindow);
+  g_K7ControlList.push_back(_listView);
+  g_K7ControlList.push_back(_statusBarWindow);
 
   // #ifndef UNDER_CE
   // if (g_ComCtl32Version >= MAKELONG(71, 4))
