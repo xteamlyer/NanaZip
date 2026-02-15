@@ -16,12 +16,16 @@ jobs:
     - uses: microsoft/setup-msbuild@main
     - name: Clear local NuGet cache (workaround for failed restores on windows-latest)
       run: dotnet nuget locals all --clear
+    - name: Restore NuGet package
+      run: MSBuild -t:Restore BuildAllTargets.proj
     - name: Refresh the build number
       run: MSBuild -target:RefreshVersion BuildAllTargets.proj
     - name: Prepare the compiled build tools binaries
       run: dotnet build --configuration Release NanaZip.Build.Tasks\NanaZip.Build.Tasks.csproj
     - name: Build
-      run: MSBuild -binaryLogger:Output\BuildAllTargets.binlog -m BuildAllTargets.proj
+      run: |
+        MSBuild -t:Restore BuildAllTargets.proj
+        MSBuild -binaryLogger:Output\BuildAllTargets.binlog -m BuildAllTargets.proj
     - name: Upload MSIX Bundle
       uses: actions/upload-artifact@main
       with:
@@ -32,19 +36,3 @@ jobs:
       with:
         name: NanaZip_Mainline_ExtensionPackageInstaller
         path: Output/NanaZip.ExtensionPackage_*.exe
-    - name: Upload MSBuild Build Process Binary Log
-      uses: actions/upload-artifact@main
-      if: '!cancelled()'
-      with:
-        name: NanaZip_Mainline_BuildBinaryLog
-        path: Output/BuildAllTargets.binlog
-    - name: Upload Portable Binaries
-      uses: actions/upload-artifact@v4
-      with:
-        name: NanaZip_Mainline_PortableBinaries
-        path: Output/Binaries/Root/Binaries
-    - name: Upload Debug Symbols
-      uses: actions/upload-artifact@v4
-      with:
-        name: NanaZip_Mainline_DebugSymbols
-        path: Output/Binaries/Root/Symbols
