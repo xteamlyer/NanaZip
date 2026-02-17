@@ -44,7 +44,7 @@ Kenji Mouri
 
 ## Features
 
-- Inherit all features from 7-Zip 24.09, [7-Zip ZS] and [7-Zip NSIS].
+- Inherit all features from 7-Zip 26.00, [7-Zip ZS] and [7-Zip NSIS].
 - Support the dark mode for all GUI components.
 - Support the Mica effect on the main window. You will enjoy the full window
   immersive Mica for all GUI components if you are using dark mode with HDR
@@ -57,7 +57,7 @@ Kenji Mouri
 - Modernize message boxes and folder browsers.
 - Provide the Smart Extraction feature.
 - Provide the Open folder after extraction option.
-- Policy mechanism for enforcing settings (see
+- Provide the policy mechanism for enforcing settings (see
   [Policies.md](/Documents/Policies.md) for details)
 - Propagates Mark-of-the-Web to all files by default.
 - Provide additional hash algorithms.
