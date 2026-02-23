@@ -27,14 +27,23 @@ scenarios.
 - Ensure the issue can be reproduced by the latest stable and/or preview of
   NanaZip. Because NanaZip introduces several security mitigations, maybe the
   issue you have found will not be reproduced.
-- Perfer making a fix PR directly, but you need to follow the rules which are
+- Perfer making a fix PR directly because we believe you may have a better
+  workaround solution than us, but you need to follow the rules, which are
   mentioned in https://github.com/M2Team/NanaZip/blob/main/CONTRIBUTING.md. You
   should read that word by word first.
+  - The PR title and descriptions should not contain the words which make other
+    guys to know it's something about security issues to reduce the risk of
+    before use from malicious guys.
 - If you don't want to make a fix PR directly, you need to provide a Proof of
   Concept (maybe a document, or samples) for that before you using private
   vulnerability reporting feature provided by GitHub, read 
   https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability
   for more information.
+  - You should provide PoC files directly, instead of generators source code
+    only, which will be easier for us to reproduce and save to test assets.
+  - We highly suggest you provide the fix logic source code snippets to help us
+    to fix issues correctly. Because many related issues are hard for us to
+    imagine how to fix them properly. This can make you and us save much time.
 
 ## Design Policy
 
