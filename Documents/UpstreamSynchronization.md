@@ -15,14 +15,14 @@
 
 ## 7-Zip ZS
 
-- NanaZip.Core: Commit 5766dd7745f6517f7ea42f6de9a190dfd92aa25f.
+- NanaZip.Core: Commit 6146959af008acfb7e92c7d38ef9e43bf9f6afbb.
 - NanaZip.UI.Classic: Unknown because it modifies the old codebase a lot.
 - NanaZip.UI.Modern: Unknown because it modifies the old codebase a lot.
-- NanaZip.Universal: Commit 5766dd7745f6517f7ea42f6de9a190dfd92aa25f.
+- NanaZip.Universal: Commit 6146959af008acfb7e92c7d38ef9e43bf9f6afbb.
 
 ## BLAKE3
 
-- NanaZip.Codecs: 1.8.2
+- NanaZip.Codecs: 1.8.4
 
 ## Brotli
 
@@ -38,7 +38,7 @@
 
 ## GmSSL
 
-- NanaZip.Codecs: 3.1.1
+- NanaZip.Codecs: Commit 0bcffd37347aa9e1799cf81e6eaeb1e76562dc6c after v3.1.1.
 
 ## LittleFS
 
@@ -58,7 +58,7 @@
 
 ## RHash
 
-- NanaZip.Codecs: Commit b76c6a3312422c09817c2cef40442b2f2d9d4689 after v1.4.6.
+- NanaZip.Codecs: Commit 3dbba4baa3cbdc3baf06d3ba086d8094bd98cd88 after v1.4.6.
 
 ## xxHash
 
