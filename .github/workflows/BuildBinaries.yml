@@ -2,13 +2,7 @@
 
 on:
   push:
-    paths-ignore:
-      - 'Documents/**'
-      - '**/*.md'
-  pull_request:
-    paths-ignore:
-      - 'Documents/**'
-      - '**/*.md'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -22,6 +16,10 @@ jobs:
     - uses: microsoft/setup-msbuild@v3
     - name: Clear local NuGet cache (workaround for failed restores on windows-latest)
       run: dotnet nuget locals all --clear
+    - name: Refresh the build number
+      run: MSBuild -target:RefreshVersion BuildAllTargets.proj
+    - name: Prepare the compiled build tools binaries
+      run: dotnet build --configuration Release NanaZip.Build.Tasks\NanaZip.Build.Tasks.csproj
     - name: Build
       run: MSBuild -binaryLogger:Output\BuildAllTargets.binlog -m BuildAllTargets.proj
     - name: Upload MSIX Bundle
