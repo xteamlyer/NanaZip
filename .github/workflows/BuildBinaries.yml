@@ -21,7 +21,7 @@ jobs:
     - name: Prepare the compiled build tools binaries
       run: dotnet build --configuration Release NanaZip.Build.Tasks\NanaZip.Build.Tasks.csproj
     - name: Build
-      run: MSBuild -binaryLogger:Output\BuildAllTargets.binlog -m BuildAllTargets.proj
+      run: MSBuild -binaryLogger:Output\BuildAllTargets.binlog -m BuildAllTargets.proj -p:NanaZipBuildWithSanitizers=true -p:NanaZipBuildPreviewRelease=true
     - name: Upload MSIX Bundle
       uses: actions/upload-artifact@v7
       with:
