@@ -2,7 +2,7 @@
 
 ## 7-Zip Mainline
 
-- NanaZip.Core: 26.01
+- NanaZip.Core: 26.02
 - NanaZip.UI.Classic: 22.01
     - Fix for CVE-2025-0411 backported from 7-Zip 24.09.
     - Fix for CVE-2025-11001 and CVE-2025-11002 backported from 7-Zip 25.00.
@@ -11,7 +11,7 @@
     - Fix for CVE-2025-0411 backported from 7-Zip 24.09.
     - Fix for CVE-2025-11001 and CVE-2025-11002 backported from 7-Zip 25.00.
     - Security enhancements for symbolic link handling backported from 7-Zip 25.01.
-- NanaZip.Universal: 26.01
+- NanaZip.Universal: 26.02
 
 ## 7-Zip ZS
 
@@ -24,7 +24,7 @@
 
 ## BLAKE3
 
-- NanaZip.Codecs: 1.8.4
+- NanaZip.Codecs: 1.8.5
 
 ## Brotli
 
@@ -40,7 +40,7 @@
 
 ## GmSSL
 
-- NanaZip.Codecs: Commit 0bcffd37347aa9e1799cf81e6eaeb1e76562dc6c after v3.1.1.
+- NanaZip.Codecs: v3.2.0.
 
 ## LittleFS
 
