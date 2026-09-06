@@ -4,29 +4,33 @@
 
 - NanaZip.Core: 26.03
 - NanaZip.UI.Classic: 22.01
-    - Fix for CVE-2025-0411 backported from 7-Zip 24.09.
-    - Fix for CVE-2025-11001 and CVE-2025-11002 backported from 7-Zip 25.00.
-    - Security enhancements for symbolic link handling backported from 7-Zip 25.01.
-    - Extract callback fix backported from 7-Zip 26.02.
+  - Fix for CVE-2025-0411 backported from 7-Zip 24.09.
+  - Fix for CVE-2025-11001 and CVE-2025-11002 backported from 7-Zip 25.00.
+  - Security enhancements for symbolic link handling backported from 7-Zip
+    25.01.
+  - Extract callback fix backported from 7-Zip 26.02, including the our simple 
+    fix for CVE-2026-58052.
 - NanaZip.UI.Modern: 22.01
-    - Fix for CVE-2025-0411 backported from 7-Zip 24.09.
-    - Fix for CVE-2025-11001 and CVE-2025-11002 backported from 7-Zip 25.00.
-    - Security enhancements for symbolic link handling backported from 7-Zip 25.01.
-    - Extract callback fix backported from 7-Zip 26.02.
+  - Fix for CVE-2025-0411 backported from 7-Zip 24.09.
+  - Fix for CVE-2025-11001 and CVE-2025-11002 backported from 7-Zip 25.00.
+  - Security enhancements for symbolic link handling backported from 7-Zip
+    25.01.
+  - Extract callback fix backported from 7-Zip 26.02, including the our simple 
+    fix for CVE-2026-58052.
 - NanaZip.Universal: 26.03
 
 ## 7-Zip ZS
 
-- NanaZip.Core: Commit 6bd426923169c6f4111425d8f1151e34b1bba101 after
+- NanaZip.Core: Commit e234d7f29f95c08cb642bcb9616cdb7d45f9862e after
   v26.02-v1.5.7-R2.
 - NanaZip.UI.Classic: Unknown because it modifies the old codebase a lot.
 - NanaZip.UI.Modern: Unknown because it modifies the old codebase a lot.
-- NanaZip.Universal: Commit 6bd426923169c6f4111425d8f1151e34b1bba101 after
+- NanaZip.Universal: Commit e234d7f29f95c08cb642bcb9616cdb7d45f9862e after
   v26.02-v1.5.7-R2.
 
 ## BLAKE3
 
-- NanaZip.Codecs: 1.8.5
+- NanaZip.Codecs: 1.8.7
 
 ## Brotli
 
