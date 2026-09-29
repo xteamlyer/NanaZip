@@ -238,7 +238,6 @@
     </ClCompile>
     <ClCompile Include="Brotli\enc\static_dict.c" />
     <ClCompile Include="Brotli\enc\utf8_util.c" />
-    <ClCompile Include="RHash\aich.c" />
     <ClCompile Include="RHash\blake2b.c" />
     <ClCompile Include="RHash\byte_order.c">
       <DisableSpecificWarnings>4146;</DisableSpecificWarnings>
@@ -259,9 +258,6 @@
     </ClCompile>
     <ClCompile Include="RHash\tiger.c" />
     <ClCompile Include="RHash\tiger_sbox.c" />
-    <ClCompile Include="RHash\torrent.c">
-      <DisableSpecificWarnings>4146;4200;</DisableSpecificWarnings>
-    </ClCompile>
     <ClCompile Include="RHash\tth.c" />
     <ClCompile Include="RHash\whirlpool.c" />
     <ClCompile Include="RHash\whirlpool_sbox.c" />
@@ -476,7 +472,6 @@
     <ClInclude Include="Brotli\include\brotli\port.h" />
     <ClInclude Include="Brotli\include\brotli\shared_dictionary.h" />
     <ClInclude Include="Brotli\include\brotli\types.h" />
-    <ClInclude Include="RHash\aich.h" />
     <ClInclude Include="RHash\blake2b.h" />
     <ClInclude Include="RHash\byte_order.h" />
     <ClInclude Include="RHash\edonr.h" />
@@ -485,12 +480,10 @@
     <ClInclude Include="RHash\has160.h" />
     <ClInclude Include="RHash\hex.h" />
     <ClInclude Include="RHash\ripemd-160.h" />
-    <ClInclude Include="RHash\sha1.h" />
     <ClInclude Include="RHash\sha256.h" />
     <ClInclude Include="RHash\sha3.h" />
     <ClInclude Include="RHash\snefru.h" />
     <ClInclude Include="RHash\tiger.h" />
-    <ClInclude Include="RHash\torrent.h" />
     <ClInclude Include="RHash\tth.h" />
     <ClInclude Include="RHash\ustd.h" />
     <ClInclude Include="RHash\util.h" />
