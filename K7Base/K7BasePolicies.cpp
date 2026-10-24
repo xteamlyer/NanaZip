@@ -24,8 +24,8 @@ namespace
     // K7BaseInitializePolicies function should be called only once during the
     // K7Base library initialization phase as early as possible.
 
-    static MO_BOOL g_AllowDynamicCodeGeneration = MO_FALSE;
-    static MO_BOOL g_AllowChildProcessCreation = MO_FALSE;
+    static MO_BOOL g_AllowDynamicCodeGeneration = MO_TRUE;
+    static MO_BOOL g_AllowChildProcessCreation = MO_TRUE;
     static std::set<std::string> g_AllowedHandlers;
     static std::set<std::string> g_BlockedHandlers;
     static std::set<std::string> g_AllowedCodecs;
@@ -141,12 +141,7 @@ EXTERN_C MO_RESULT MOAPI K7BaseInitializePolicies()
             PoliciesKeyHandle,
             L"AllowDynamicCodeGeneration"))
         {
-            if (1 == Value)
-            {
-                // Only when the registry value is 1, NanaZip will allow dynamic
-                // code generation.
-                g_AllowDynamicCodeGeneration = MO_TRUE;
-            }
+            g_AllowDynamicCodeGeneration = (1 == Value) ? MO_TRUE : MO_FALSE;
         }
     }
 
@@ -157,12 +152,7 @@ EXTERN_C MO_RESULT MOAPI K7BaseInitializePolicies()
             PoliciesKeyHandle,
             L"AllowChildProcessCreation"))
         {
-            if (1 == Value)
-            {
-                // Only when the registry value is 1, NanaZip will allow child
-                // process creation.
-                g_AllowChildProcessCreation = MO_TRUE;
-            }
+            g_AllowChildProcessCreation = (1 == Value) ? MO_TRUE : MO_FALSE;
         }
     }
 

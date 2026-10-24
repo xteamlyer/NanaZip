@@ -156,10 +156,12 @@ void CInfo::Load()
 {
   PathMode = NPathMode::kCurPaths;
   PathMode_Force = false;
-  OverwriteMode = NOverwriteMode::kAsk;
-  OverwriteMode_Force = false;
+  OverwriteMode = NOverwriteMode::kOverwrite;
+  OverwriteMode_Force = true;
   
   SplitDest.Val = true;
+  ShowPassword.Val = true;
+  ShowPassword.Def = false;
 
   Paths.Clear();
 
@@ -186,7 +188,7 @@ void CInfo::Load()
   Key_Get_BoolPair(key, kElimDup, ElimDup);
   // Key_Get_BoolPair(key, kAltStreams, AltStreams);
   Key_Get_BoolPair(key, kNtSecur, NtSecurity);
-  Key_Get_BoolPair(key, kShowPassword, ShowPassword);
+  Key_Get_BoolPair_true(key, kShowPassword, ShowPassword);
   // **************** NanaZip Modification Start ****************
   Key_Get_BoolPair(key, kOpenFolderAfterExtract, OpenFolder);
   // **************** NanaZip Modification End ****************
@@ -196,7 +198,7 @@ bool Read_ShowPassword()
 {
   CS_LOCK
   CKey key;
-  bool showPassword = false;
+  bool showPassword = true;
   if (OpenMainKey(key, kKeyName) != ERROR_SUCCESS)
     return showPassword;
   key.GetValue_bool_IfOk(kShowPassword, showPassword);

@@ -176,10 +176,10 @@ namespace NWorkDir
     bool ForRemovableOnly;
     FString Path;
 
-    void SetForRemovableOnlyDefault() { ForRemovableOnly = true; }
+    void SetForRemovableOnlyDefault() { ForRemovableOnly = false; }
     void SetDefault()
     {
-      Mode = NMode::kSystem;
+      Mode = NMode::kCurrent;
       Path.Empty();
       SetForRemovableOnlyDefault();
     }
